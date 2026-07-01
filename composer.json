@@ -6,6 +6,7 @@
   "require": {
     "php": "^8.3",
     "bitexpert/phpstan-magento": "^0.11.0",
+    "captainhook/captainhook": "^5.29",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
     "ergebnis/composer-normalize": "^2.42",
     "magento/magento-coding-standard": "^33",

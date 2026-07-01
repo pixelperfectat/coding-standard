@@ -1,0 +1,31 @@
+{
+    "commit-msg": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "\\CaptainHook\\App\\Hook\\Message\\Action\\Regex",
+                "options": {
+                    "regex": "#^(\\[[^\\]]+\\]\\s+)?(Add|Implement|Introduce|Update|Refactor|Improve|Change|Bump|Deprecate|Remove|Delete|Drop|Fix|Correct|Resolve|Security)\\s+.+#",
+                    "error": "Commit message does not follow the house format.\nRequired: [optional-issue] Keyword Description\nKeyword must be one of: Add, Implement, Introduce, Update, Refactor, Improve, Change, Bump, Deprecate, Remove, Delete, Drop, Fix, Correct, Resolve, Security"
+                }
+            },
+            {
+                "action": "bash -c 'grep -qEi \"(Co-Authored-By|Generated with).*(Claude|Gemini|Copilot|ChatGPT)\" \"$1\" && echo \"ERROR: AI attribution is not allowed in commit messages\" && exit 1 || exit 0' -- {$MESSAGE_PATH}",
+                "options": {}
+            }
+        ]
+    },
+    "pre-commit": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "composer lint",
+                "options": {}
+            },
+            {
+                "action": "composer cs",
+                "options": {}
+            }
+        ]
+    }
+}

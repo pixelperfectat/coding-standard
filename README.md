@@ -35,5 +35,27 @@ parameters:
     # module-specific excludePaths / ignoreErrors here
 ```
 
+## Git hooks (captainhook)
+
+This package ships a `captainhook.json` with two hooks. After installing this package in a
+consuming module, activate the hooks once with:
+
+```bash
+vendor/bin/captainhook install -f -c vendor/pixelperfectat/coding-standard/captainhook.json
+```
+
+### commit-msg
+1. **Keyword format** — the subject line must start with one of:
+   `Add`, `Implement`, `Introduce`, `Update`, `Refactor`, `Improve`, `Change`, `Bump`,
+   `Deprecate`, `Remove`, `Delete`, `Drop`, `Fix`, `Correct`, `Resolve`, `Security`
+   (optionally preceded by an issue reference in brackets, e.g. `[PROJ-123] Fix …`).
+2. **AI attribution rejection** — rejects commit messages that contain
+   `Co-Authored-By` or `Generated with` referencing Claude, Gemini, Copilot, or ChatGPT.
+
+### pre-commit
+Runs `composer lint` and `composer cs` before every commit to catch lint/style errors early.
+
+---
+
 Consumed via a git VCS `repositories` entry (auth `CI_JOB_TOKEN`) until the GitLab Composer
 Registry is set up.
