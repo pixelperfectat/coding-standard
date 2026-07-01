@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<ruleset name="PixelPerfect">
+    <description>PixelPerfect shared Magento module coding standard (extends Magento2).</description>
+
+    <rule ref="Magento2">
+        <!-- We own interfaces that are deliberately implemented by final classes. -->
+        <exclude name="Magento2.PHP.FinalImplementation"/>
+
+        <!-- Minimal-comments policy: do NOT force @param/@return docblocks that merely
+             restate the typed signature. This is the bulk of the historical warning noise
+             and conflicts with "comments are a code smell". Real type info that static
+             analysis can't infer should still be documented by choice, not by sniff. -->
+        <exclude name="Magento2.Annotation.MethodArguments"/>
+    </rule>
+</ruleset>

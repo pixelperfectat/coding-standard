@@ -1,0 +1,7 @@
+parameters:
+    level: 6
+    reportUnmatchedIgnoredErrors: false
+    bootstrapFiles:
+        # %currentWorkingDirectory% = where phpstan is invoked (the module root — module is the
+        # composer root project in CI and in a local clone). Resolves in either layout.
+        - %currentWorkingDirectory%/vendor/bitexpert/phpstan-magento/autoload.php
