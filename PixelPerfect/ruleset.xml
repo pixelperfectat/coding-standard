@@ -11,5 +11,13 @@
              and conflicts with "comments are a code smell". Real type info that static
              analysis can't infer should still be documented by choice, not by sniff. -->
         <exclude name="Magento2.Annotation.MethodArguments"/>
+
+        <!-- We pin php ^8.3 across all modules. Magento2 bundles PHPCompatibility with a lower
+             target that a <config name="testVersion"> does NOT override (verified: readonly is
+             flagged even at 8.3-), so it false-flags valid 8.2/8.3 syntax (readonly classes, DNF
+             types, etc.). Drop it wholesale so no module needs per-feature sniff exclusions.
+             If forward-compat checks are ever wanted, run PHPCompatibility separately with an
+             explicit, working testVersion. -->
+        <exclude name="PHPCompatibility"/>
     </rule>
 </ruleset>
