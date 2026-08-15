@@ -23,6 +23,7 @@
         }
     },
     "bin": [
-        "bin/check-module-boundaries.php"
+        "bin/check-module-boundaries.php",
+        "bin/check-xml-class-refs.php"
     ]
 }
