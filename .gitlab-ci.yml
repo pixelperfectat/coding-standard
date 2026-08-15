@@ -1,0 +1,35 @@
+# This package is consumed over Composer, so a tag that does not publish is a silent failure:
+# the tag exists, `composer require` still resolves the previous version, and nothing reports it.
+stages:
+  - validate
+  - release
+
+validate:composer:
+  stage: validate
+  image: markoshust/magento-php:8.3-fpm
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: on_success
+  script:
+    - composer validate --no-check-publish --no-check-lock
+    - php -l bin/check-module-boundaries.php
+
+publish:
+  stage: release
+  image: markoshust/magento-php:8.3-fpm
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/
+  script:
+    - |
+      curl --fail --silent --show-error \
+           --data tag="${CI_COMMIT_TAG}" \
+           --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/composer"
+    # Assert the postcondition rather than trusting the call above.
+    - |
+      curl --fail --silent --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages" \
+        | grep -q "\"version\":\"${CI_COMMIT_TAG}\"" \
+        || { echo "publish reported success but ${CI_COMMIT_TAG} is not in the registry"; exit 1; }
+      echo "verified: ${CI_COMMIT_TAG} is in the registry"
