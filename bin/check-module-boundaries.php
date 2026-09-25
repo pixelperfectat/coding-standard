@@ -48,9 +48,43 @@ foreach (array_keys($composer['autoload']['psr-4'] ?? []) as $ns) {
         $own[] = $parts[0] . '_' . $parts[1];
     }
 }
+/**
+ * A dependency's real Magento module name, read from the installed package rather than guessed.
+ *
+ * The slug and the module name do not have to agree: "magento2-module-eu-vat-exemption" ships
+ * "PixelPerfect_EuVat". Guessing from the slug alone rejects a dependency that is properly
+ * declared, so ask the package itself when it is installed. Vendor directories are the only
+ * place that answer lives; when the package is not installed the guess still applies, which is
+ * no worse than before.
+ */
+$installedNames = static function (string $package) use ($root): array {
+    $dir = $root . '/vendor/' . $package;
+    $names = [];
+
+    $registration = $dir . '/registration.php';
+    if (is_file($registration)
+        && preg_match('/[\'"]([A-Za-z]+_[A-Za-z0-9]+)[\'"]/', (string)file_get_contents($registration), $m)
+    ) {
+        $names[] = $m[1];
+    }
+
+    $manifest = $dir . '/composer.json';
+    if (is_file($manifest)) {
+        $decoded = json_decode((string)file_get_contents($manifest), true);
+        foreach (array_keys($decoded['autoload']['psr-4'] ?? []) as $ns) {
+            $parts = array_values(array_filter(explode('\\', $ns)));
+            if (count($parts) >= 2) {
+                $names[] = $parts[0] . '_' . $parts[1];
+            }
+        }
+    }
+
+    return $names;
+};
+
 $allowed = $own;
 foreach (array_merge(array_keys($composer['require'] ?? []), array_keys($composer['require-dev'] ?? [])) as $dep) {
-    $allowed = array_merge($allowed, $aliases($dep));
+    $allowed = array_merge($allowed, $aliases($dep), $installedNames($dep));
 }
 $allowed = array_unique(array_filter($allowed, static fn($a) => $a !== ''));
 $allowedLower = array_map('strtolower', $allowed);
