@@ -16,7 +16,7 @@ Shared coding standard + QA toolchain for PixelPerfect Magento modules. Bump thi
 ## Use in a module
 `composer.json`:
 ```json
-"require-dev": { "pixelperfectat/coding-standard": "^0.1.0", "phpunit/phpunit": "^9.6" }
+"require-dev": { "pixelperfectat/coding-standard": "^0.2.0", "phpunit/phpunit": "^9.6" }
 ```
 `phpcs.xml`:
 ```xml
