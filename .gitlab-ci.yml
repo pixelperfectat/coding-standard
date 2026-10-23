@@ -13,7 +13,24 @@ validate:composer:
     - when: on_success
   script:
     - composer validate --no-check-publish --no-check-lock
-    - php -l bin/check-module-boundaries.php
+    - for f in bin/*.php ci/*.php; do php -l "$f" || exit 1; done
+
+# A caret on a 0.x pin never admits the next minor, so the toolchain can fall a year behind while
+# every module stays green. Runs weekly from a pipeline schedule; fails when a newer tool installs
+# with the rest of the toolchain and only our own constraint holds it back.
+toolchain:drift:
+  stage: validate
+  image: markoshust/magento-php:8.3-fpm
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: on_success
+      allow_failure: true
+  script:
+    - composer update --no-interaction --no-progress --no-scripts
+    - php ci/check-toolchain-drift.php
 
 publish:
   stage: release

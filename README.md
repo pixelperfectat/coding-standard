@@ -13,10 +13,17 @@ Shared coding standard + QA toolchain for PixelPerfect Magento modules. Bump thi
   bitexpert/phpstan-magento, parallel-lint, composer-normalize) — so consuming modules only
   add this one package (+ their own `phpunit`).
 
+## Keeping the toolchain current
+A weekly pipeline schedule runs the `toolchain:drift` job (`ci/check-toolchain-drift.php`). It
+resolves the newest toolchain that installs together and fails when a tool could move up but our
+own constraint holds it back. A tool that another tool pins (for example phpcs 4, which
+magento-coding-standard does not accept yet) does not fail the job. When the job fails, raise the
+constraint, run the gates of one consuming module against it, and release a new minor.
+
 ## Use in a module
 `composer.json`:
 ```json
-"require-dev": { "pixelperfectat/coding-standard": "^0.1.0", "phpunit/phpunit": "^9.6" }
+"require-dev": { "pixelperfectat/coding-standard": "^0.2.0", "phpunit/phpunit": "^9.6" }
 ```
 `phpcs.xml`:
 ```xml
