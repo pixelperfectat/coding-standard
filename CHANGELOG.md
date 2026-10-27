@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - The package is released under the MIT license, matching the public modules that depend on it. It was marked `proprietary` while published on GitHub and Packagist
 
+### Fixed
+- `check-xml-class-refs` checked nothing in modules with a `src/` layout: it looked for `etc/` only at the repository root and printed "OK - no etc/ directory". It now reads `etc/` next to the `registration.php` that composer autoloads, falling back to the root
+- `check-xml-class-refs` only recognised classes spelled `PixelPerfect\`. It now checks the module's own PSR-4 namespaces and the vendor namespace in either spelling, and accepts digits and underscores in class names
+
 ## [0.2.0] - 2026-10-23
 
 ### Added

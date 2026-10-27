@@ -18,20 +18,44 @@ if (!is_file("$root/composer.json")) {
     fwrite(STDERR, "no composer.json at $root\n");
     exit(2);
 }
-if (!is_dir("$root/etc")) {
-    echo "xml-class-refs: OK - no etc/ directory\n";
-    exit(0);
-}
 
 $composer = json_decode((string)file_get_contents("$root/composer.json"), true, 512, JSON_THROW_ON_ERROR);
 $psr4 = $composer['autoload']['psr-4'] ?? [];
 
-$xmlFiles = [];
-foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator("$root/etc", FilesystemIterator::SKIP_DOTS)) as $f) {
-    if (preg_match('/\.xml$/', $f->getFilename())) {
-        $xmlFiles[] = $f->getPathname();
+/**
+ * The module's etc/ sits next to its registration.php, which composer autoloads. That is the repo root
+ * for a flat module and src/ for a src/ layout; looking only at the root checked nothing in the latter.
+ */
+$etcDirs = [];
+foreach ((array)($composer['autoload']['files'] ?? []) as $file) {
+    if (basename($file) === 'registration.php' && is_dir(dirname("$root/$file") . '/etc')) {
+        $etcDirs[] = dirname("$root/$file") . '/etc';
     }
 }
+if ($etcDirs === [] && is_dir("$root/etc")) {
+    $etcDirs[] = "$root/etc";
+}
+if ($etcDirs === []) {
+    echo "xml-class-refs: OK - no etc/ directory next to registration.php or at the root\n";
+    exit(0);
+}
+
+$xmlFiles = [];
+foreach (array_unique($etcDirs) as $etcDir) {
+    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($etcDir, FilesystemIterator::SKIP_DOTS)) as $f) {
+        if (preg_match('/\.xml$/', $f->getFilename())) {
+            $xmlFiles[] = $f->getPathname();
+        }
+    }
+}
+
+/**
+ * Classes to check: the module's own PSR-4 namespaces, plus the vendor namespace in either spelling
+ * (PixelPerfect\, Pixelperfect\) for classes that come from sibling modules.
+ */
+$prefixes = array_map(static fn(string $ns): string => preg_quote(rtrim($ns, '\\') . '\\', '#'), array_keys($psr4));
+$prefixes[] = '(?i:pixelperfect)\\\\';
+$classPattern = '((?:' . implode('|', $prefixes) . ')[A-Za-z0-9_\\\\]+)';
 
 /** virtualType names are declared in XML, not autoloaded -- they are not missing classes. */
 $virtual = [];
@@ -78,7 +102,7 @@ $bad = [];
 foreach ($xmlFiles as $path) {
     $rel = ltrim(str_replace($root, '', $path), '/');
     foreach (file($path) as $i => $line) {
-        if (!preg_match_all('#(?:instance|class|type)="(PixelPerfect\\\\[A-Za-z\\\\]+)"|<item[^>]*xsi:type="object"[^>]*>\s*(PixelPerfect\\\\[A-Za-z\\\\]+)#', $line, $m)) {
+        if (!preg_match_all('#(?:instance|class|type)="' . $classPattern . '"|<item[^>]*xsi:type="object"[^>]*>\s*' . $classPattern . '#', $line, $m)) {
             continue;
         }
         $names = array_filter(array_merge($m[1], $m[2]));
@@ -92,7 +116,7 @@ foreach ($xmlFiles as $path) {
 }
 
 if ($bad === []) {
-    echo "xml-class-refs: OK - every class named in etc/ resolves\n";
+    echo "xml-class-refs: OK - every class named in " . implode(', ', array_map(static fn(string $d): string => ltrim(str_replace($root, '', $d), '/') . '/', array_unique($etcDirs))) . " resolves\n";
     exit(0);
 }
 
