@@ -2,7 +2,7 @@
     "name": "pixelperfectat/coding-standard",
     "description": "PixelPerfect shared Magento module coding standard: phpcs ruleset (extends Magento2), phpstan config, and the pinned QA toolchain.",
     "type": "phpcodesniffer-standard",
-    "license": "proprietary",
+    "license": "MIT",
     "require": {
         "php": "^8.3",
         "bitexpert/phpstan-magento": "^0.44.0",
