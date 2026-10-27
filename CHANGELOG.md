@@ -5,15 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.1] - 2026-10-27
 
 ### Changed
-- The package is released under the MIT license, matching the public modules that depend on it. It was marked `proprietary` while published on GitHub and Packagist
+- The package is released under the MIT license, matching the public modules that depend on it. It was marked `proprietary` while published on GitHub and Packagist (0b90c3b)
 
 ### Fixed
-- `check-xml-class-refs` checked nothing in modules with a `src/` layout: it looked for `etc/` only at the repository root and printed "OK - no etc/ directory". It now reads `etc/` next to the `registration.php` that composer autoloads, falling back to the root
-- `check-xml-class-refs` only recognised classes spelled `PixelPerfect\`. It now checks the module's own PSR-4 namespaces and the vendor namespace in either spelling, and accepts digits and underscores in class names
-- `check-module-boundaries` rejected a module whose README or CHANGELOG mentioned `pixelperfectat/ci-templates`, which is never a composer dependency. The shared tooling packages (ci-templates, coding-standard) are now always allowed, since they are not modules
+- `check-xml-class-refs` checked nothing in modules with a `src/` layout: it looked for `etc/` only at the repository root and printed "OK - no etc/ directory". It now reads `etc/` next to the `registration.php` that composer autoloads, falling back to the root (14d9aa1)
+- `check-xml-class-refs` only recognised classes spelled `PixelPerfect\`. It now checks the module's own PSR-4 namespaces and the vendor namespace in either spelling, and accepts digits and underscores in class names (14d9aa1)
+- `check-module-boundaries` rejected a module whose README or CHANGELOG mentioned `pixelperfectat/ci-templates`, which is never a composer dependency. The shared tooling packages (ci-templates, coding-standard) are now always allowed, since they are not modules (ccb2071)
 
 ## [0.2.0] - 2026-10-23
 
