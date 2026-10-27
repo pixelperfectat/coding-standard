@@ -82,7 +82,13 @@ $installedNames = static function (string $package) use ($root): array {
     return $names;
 };
 
-$allowed = $own;
+/**
+ * Shared tooling, not modules: a module's README, CHANGELOG or CI config may name it without
+ * depending on it. ci-templates is never a composer dependency, so nothing else would allow it.
+ */
+$tooling = ['pixelperfectat/ci-templates', 'pixelperfectat/coding-standard'];
+
+$allowed = array_merge($own, $tooling);
 foreach (array_merge(array_keys($composer['require'] ?? []), array_keys($composer['require-dev'] ?? [])) as $dep) {
     $allowed = array_merge($allowed, $aliases($dep), $installedNames($dep));
 }

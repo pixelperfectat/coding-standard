@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - `check-xml-class-refs` checked nothing in modules with a `src/` layout: it looked for `etc/` only at the repository root and printed "OK - no etc/ directory". It now reads `etc/` next to the `registration.php` that composer autoloads, falling back to the root
 - `check-xml-class-refs` only recognised classes spelled `PixelPerfect\`. It now checks the module's own PSR-4 namespaces and the vendor namespace in either spelling, and accepts digits and underscores in class names
+- `check-module-boundaries` rejected a module whose README or CHANGELOG mentioned `pixelperfectat/ci-templates`, which is never a composer dependency. The shared tooling packages (ci-templates, coding-standard) are now always allowed, since they are not modules
 
 ## [0.2.0] - 2026-10-23
 
