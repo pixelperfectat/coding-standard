@@ -89,7 +89,12 @@ $installedNames = static function (string $package) use ($root): array {
 $tooling = ['pixelperfectat/ci-templates', 'pixelperfectat/coding-standard'];
 
 $allowed = array_merge($own, $tooling);
-foreach (array_merge(array_keys($composer['require'] ?? []), array_keys($composer['require-dev'] ?? [])) as $dep) {
+// `suggest` counts too: a module's README may name the optional companions it declares there.
+foreach (array_merge(
+    array_keys($composer['require'] ?? []),
+    array_keys($composer['require-dev'] ?? []),
+    array_keys($composer['suggest'] ?? [])
+) as $dep) {
     $allowed = array_merge($allowed, $aliases($dep), $installedNames($dep));
 }
 $allowed = array_unique(array_filter($allowed, static fn($a) => $a !== ''));
@@ -145,5 +150,5 @@ fwrite(STDERR, "A parent must never name a child: it does not require it, and it
 foreach (array_unique($violations) as $v) {
     fwrite(STDERR, "  $v\n");
 }
-fwrite(STDERR, "\nEither add the dependency to composer.json, or remove the reference.\n");
+fwrite(STDERR, "\nEither add the package to composer.json (require, require-dev or suggest), or remove the reference.\n");
 exit(1);
